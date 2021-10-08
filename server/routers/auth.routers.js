@@ -20,7 +20,7 @@ router.post('/resgister', async (req, res) => {
 
     // Simple validation
     if (!username || !password) 
-        return res.status(400).json({ success: false, message: 'Missing username add/or password' })
+        return res.status(400).json({ success: false, message: 'Missing username and/or password' })
 
     try {
         // check for existing user
@@ -45,6 +45,42 @@ router.post('/resgister', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false, message: 'Internal server error' })
+    }
+})
+
+// @router POST api/auth/login
+// @desc Login user
+// @access Public
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body
+
+    // Simple validation
+    if (!username || !password)
+        return res.status(400).json({ success: false, message: 'Missing username and/or password' })
+
+    try {
+        // Check for existing user
+        const user = await User.findOne({ username })
+        if (!user) 
+            return res.status(400).json({ success: false, message: 'Incorrect username or password' })
+
+        // username found
+        const passwordValidate = await argon2.verify(user.password, password)
+        if (!passwordValidate) 
+            return res.status(400).json({ success: false, message: 'Incorrect username or password' })
+
+        // All good
+        // Return taken
+        const accessToken = jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET)
+        res.json({
+            success: true,
+            message: 'User logged in successfully',
+            accessToken
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: 'Interval server error' })
     }
 })
 
