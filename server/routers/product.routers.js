@@ -3,21 +3,32 @@ const router = express.Router()
 
 const Product = require('../models/Product.models')
 
-router.get('/', async (req, res, next) => {
-    var page = req.query.page || 1 // n
-    var perPage = 8
+// @router GET api/products
+// @desc GET all products from db
+// @access Public 
+router.get('/', async (req, res) => {
+    try {
+        const products = await Product.find({})
 
-    Product
-        .find()
-        .skip((perPage * page) - perPage) // first page value is 0
-        .limit(perPage)
-        .exec((err, products) => {
-            Product.countDocuments((err, count) => { // how many pages are there to see?
-                if (err) return next(err);
-                // res.send(products) // returns product data in json, XML, ....
-                res.render()
-            })
-        })
+        res.json({ success: true, products })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: 'Internal server error' })
+    }
+})
+
+// @router GET api/products/:id
+// @desc GET a products by id from db
+// @access Public
+router.get('/:id', async (req, res) => {
+    try {
+        const products = await Product.findById(req.params.id)
+
+        res.json({ success: true, products })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: 'Internal server error' })
+    }
 })
 
 module.exports = router

@@ -15,3 +15,10 @@ Content-Type: application/json
     "username": "oanhtran",
     "password": "oanhtran1"
 }
+
+###
+
+GET http://localhost:5000/api/products
+
+###
+GET http://localhost:5000/api/products/616019ff49fada06247ba84b
